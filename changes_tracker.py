@@ -37,11 +37,23 @@ def get_paragraphs(xml_root):
         if full_text.strip():
             paras.append(full_text.strip())
     return paras
+# Apply change to paragraph using fuzzy match 
+def match_change(change_text, paragraphs, threshold=60):
+    match = process.extractOne(change_text, paragraphs)
+    if match and match[1] >= threshold:
+        return match[0]
+    return None
+
 
 english_xml = get_document_xml(english_docx)
 chinese_xml = get_document_xml(chinese_docx)
 tracked_changes = get_tracked_changes(english_xml)
 chinese_paras = get_paragraphs(chinese_xml)
-print(chinese_paras)
+matched = {}
+for _, text in tracked_changes:
+    match = match_change(text, chinese_paras)
+    if match:
+        matched[text] = match
+print(matched)
 
 
