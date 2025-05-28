@@ -28,10 +28,20 @@ def get_tracked_changes(xml_root):
             if full_text.strip():
                 changes.append((change_type, full_text.strip()))
     return changes
+# Extract all paragraphs 
+def get_paragraphs(xml_root):
+    paras = []
+    for para in xml_root.findall('.//w:p', ns):
+        texts = para.findall('.//w:t', ns)
+        full_text = ''.join([t.text for t in texts if t.text])
+        if full_text.strip():
+            paras.append(full_text.strip())
+    return paras
 
 english_xml = get_document_xml(english_docx)
 chinese_xml = get_document_xml(chinese_docx)
 tracked_changes = get_tracked_changes(english_xml)
-print(tracked_changes)
+chinese_paras = get_paragraphs(chinese_xml)
+print(chinese_paras)
 
 
