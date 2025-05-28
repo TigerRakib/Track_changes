@@ -18,9 +18,20 @@ def get_document_xml(docx_path):
     with ZipFile(docx_path, 'r') as docx:
         xml = docx.read('word/document.xml')
     return ET.fromstring(xml)
-
+# Extract track changes
+def get_tracked_changes(xml_root):
+    changes = []
+    for change_type in ['ins', 'del']:
+        for tag in xml_root.findall(f'.//w:{change_type}', ns):
+            texts = tag.findall('.//w:t', ns)
+            full_text = ''.join([t.text for t in texts if t.text])
+            if full_text.strip():
+                changes.append((change_type, full_text.strip()))
+    return changes
 
 english_xml = get_document_xml(english_docx)
 chinese_xml = get_document_xml(chinese_docx)
+tracked_changes = get_tracked_changes(english_xml)
+print(tracked_changes)
 
 
