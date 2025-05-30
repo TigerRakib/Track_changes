@@ -1,80 +1,124 @@
+# 📄 DOCX Translator & Modifier
 
-# Word Track Changes Translator Tool
+A powerful and flexible Python tool to automate translations and text modifications within `.docx` files. This script allows you to translate document content, remove specially formatted text, and insert custom-formatted text while preserving the original layout and style.
 
-This tool automates the transfer of tracked changes from an English Word document to its corresponding Chinese translation, preserving edits with visible annotations.
+---
 
-##  Use Case
+## ✨ Features
 
-Given:
-- An English `.docx` file with **tracked changes**
-- A Chinese `.docx` file that is a direct translation of the **original** English version
+- **🌐 Full Document Translation**  
+  Translate all editable text in a DOCX document into a specified target language (e.g., Simplified Chinese).
 
-This tool will:
-1. Extract tracked changes (insertions & deletions) from the English file.
-2. Fuzzy match the changed segments to the Chinese content.
-3. Insert Chinese annotations indicating insertions/deletions.
-4. Save a new `.docx` Chinese file with those changes annotated.
+- **❌ Selective Text Removal**  
+  Automatically detect and remove text segments formatted in **blue color** and with a **strikethrough effect**.
 
-##  File Structure
+- **➕ Custom Text Insertion**  
+  Add user-defined paragraphs into the document. These will be translated and styled in **blue and underlined**.
 
-```
-project/
-│
-├──[Track Changes] KFS - AXA Global Strategic Bonds_E.docxenglish.docx   # English Word doc with tracked changes
-├──KFS - AXA Global Strategic Bonds_C 8.53.14 AM.docx.docx               # Chinese version (original translation)
-├──track_changer.py                                                      # Python script (main logic)
-├──updated_chinese_with_changes.docx                                     # Output file (auto-generated)
-└──README.md                                                             # This file
-```
+- **🧬 Format Preservation**  
+  By directly modifying `document.xml` using `lxml`, the script maintains existing styles (fonts, sizes, bolding, etc.) as much as possible.
 
-## Requirements
+---
 
-Install the required Python packages:
+## 🛠️ Prerequisites
+
+Make sure you have Python 3 installed, then install the required dependencies:
 
 ```bash
-pip install python-docx lxml fuzzywuzzy python-Levenshtein
+pip install lxml deep-translator python-docx
 ```
 
-## Usage
+---
 
-1. Place your Word documents in the project directory and rename them:
-   - `english.docx`
-   - `chinese.docx`
+## 🚀 How It Works
 
-2. Run the script:
+1. **Unzip DOCX File**  
+   `.docx` files are treated as ZIP archives. The script unzips them to a temporary folder.
+
+2. **Parse Main Content**  
+   It parses `word/document.xml` to locate and manipulate all text content.
+
+3. **Translate Existing Text**  
+   All `<w:t>` elements are extracted and sent to Google Translate via `deep_translator`.
+
+4. **Remove Specific Runs**  
+   Deletes `<w:r>` (run) elements that are both blue-colored and strikethrough.
+
+5. **Translate & Insert Custom Text**  
+   Your specified text is translated and added to the end of the document, formatted in blue and underlined.
+
+6. **Save & Repack**  
+   Updates the document XML, re-zips the folder into a `.docx` file, and deletes temporary files.
+
+---
+
+## 💻 Usage
+
+1. **Save the Script**  
+   Save the script as `track_changer.py`.
+
+2. **Place Your Input File**  
+   Place your `.docx` file (e.g., `demo.docx`) in the same directory.
+
+3. **Run the Script**
 
 ```bash
-python script.py
+track_changer.py
 ```
 
-3. Output:
-   - `updated_chinese_with_changes.docx` will contain visible annotations like:
+---
 
-     - `（新增內容: XX）` → Inserted content
-     - `（刪除內容: XX）` → Deleted content
+## 🔧 Configuration Example
 
-##  Example Annotation
+Edit the configuration at the end of the script to customize file paths, translation text, and target language:
 
-If a phrase was inserted in English and matched to its Chinese equivalent, the Chinese document will include:
+```python
+# === Example usage ===
+input_file = "demo.docx"                 # Path to your input updated english DOCX file
+output_file = "output_full_chinese.docx" # Output file path
+text_to_add = ""
+target_language = "zh-CN"                # Target language code (e.g., 'en', 'zh-CN', 'es')
 
-```
-原有文本（新增內容: 插入內容）
-```
-
-If something was deleted:
-
-```
-原有文本（刪除內容: 刪除的內容）
+modify_docx_preserve_format(input_file, output_file, text_to_add, target_language)
 ```
 
-## Note on Track Changes in Word
+---
 
-This version uses visible annotations in parentheses to simulate tracked changes.
+## ⚠️ Troubleshooting
 
+- **Script Freezes During Translation**  
+  - Check your internet connection.
+  - Add a delay (e.g., `time.sleep(0.5)`) between translations to avoid Google rate limits.
+  - Update `deep_translator`:  
+    ```bash
+    pip install --upgrade deep-translator
+    ```
 
-## Limitations
+- **Output DOCX Is Corrupted**  
+  - Ensure XML is well-formed and correctly modified.
+  - Make sure files are properly re-zipped into `.docx` format.
 
-- Fuzzy matching relies on partial text alignment; translation consistency improves accuracy.
-- Manual validation recommended for critical documents.
-- This script does not preserve Word-specific styling or formatting.
+- **No Translation Occurs**  
+  - Verify `target_language` is valid.
+  - Test `deep_translator` with a small string separately to confirm it's working.
 
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!  
+Fork the repo, report issues, or submit pull requests for improvements and new features.
+
+---
+
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+---
+
+## 📬 Contact
+
+Have questions or suggestions? Feel free to open an issue or start a discussion.
+
+May Allah bless you. 
